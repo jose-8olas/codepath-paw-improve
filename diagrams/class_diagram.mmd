@@ -1,0 +1,95 @@
+classDiagram
+    class Task {
+        +str title
+        +str task_type
+        +int duration
+        +str priority
+        +str time
+        +str frequency
+        +bool completed
+        +date due_date
+        +mark_completed() None
+        +update(fields) dict
+    }
+
+    class Pet {
+        +str pet_id
+        +str name
+        +str species
+        +list~Task~ tasks
+        +add_task(task) None
+        +get_tasks() list~Task~
+        +remove_task(task) bool
+    }
+
+    class Owner {
+        +str owner_id
+        +str name
+        +dict preferences
+        +list~Pet~ pets
+        +add_pet(pet) None
+        +remove_pet(pet_id) bool
+        +remove_task(task) bool
+        +clear_completed_tasks() int
+        +next_pet_id() str
+        +update_pet(pet_id, name, species) bool
+        +find_conflicting_tasks(task) list
+        +get_all_tasks() list~Task~
+        +save_to_json(filename) None
+        +load_from_json(filename) None
+    }
+
+    class Scheduler {
+        +int available_time
+        +list~Task~ tasks
+        +schedule_task(task) None
+        +get_tasks_from_owner(owner) list~Task~
+        +sort_by_time() list~Task~
+        +sort_by_priority() list~Task~
+        +filter_by_status(completed) list~Task~
+        +filter_by_pet(owner, pet_id) list~Task~
+        +complete_task(owner, task) Task or None
+        +detect_conflicts(target_date) list~Task~
+        +detect_time_conflicts() list~str~
+        +generate_daily_plan(target_date) list~Task~
+        +find_next_available_slot(date, start, duration) str or None
+    }
+
+    class TaskValidator {
+        <<module task_validator.py>>
+        +validate_task_proposals(proposals, pets, current_date) dict
+        +time_ranges_overlap(start_a, dur_a, start_b, dur_b) bool
+    }
+
+    class AITaskParser {
+        <<module ai_task_parser.py>>
+        +build_system_prompt(pet_names, current_date) str
+        +parse_task_request(request, pets, date) dict
+    }
+
+    class AIWorkflow {
+        <<module ai_workflow.py>>
+        +process_ai_task_request(request, owner, date, max_retries) dict
+        +revise_proposal(owner, edited_tasks, date) dict
+        +find_proposal_conflicts(owner, proposals) list~str~
+        +build_retry_messages(previous_output, errors) list
+    }
+
+    class EvalHarness {
+        <<script eval_ai.py>>
+        +run_all(parse_fn, repeat) list
+        +format_report(records, mode, repeat) str
+        +write_traces(path, records, mode) str
+    }
+
+    Owner "1" *-- "0..*" Pet : owns
+    Pet "1" *-- "0..*" Task : contains
+    Scheduler "1" o-- "0..*" Task : organizes
+    Scheduler ..> Owner : retrieves tasks from
+    AIWorkflow ..> AITaskParser : asks the model
+    AIWorkflow ..> TaskValidator : validates every proposal
+    AIWorkflow ..> Owner : reads pets, never saves
+    Task ..> TaskValidator : shared rules
+    Owner ..> TaskValidator : overlap check
+    Scheduler ..> TaskValidator : overlap check
+    EvalHarness ..> AIWorkflow : runs 11 prompts
