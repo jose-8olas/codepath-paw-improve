@@ -1,0 +1,46 @@
+2026-11-21 17:50:12,473 | INFO | pawpal.app | Loaded data from data.json
+2026-11-21 17:54:48,679 | INFO | pawpal.app | Loaded data from data.json
+2026-11-21 17:55:34,542 | INFO | pawpal.app | User DELETED pet Mochi (P001) and its 3 task(s).
+2026-11-21 17:55:39,183 | INFO | pawpal.app | User DELETED pet Max (P002) and its 1 task(s).
+2026-11-21 17:55:45,236 | INFO | pawpal.app | User DELETED pet Mochi (P004) and its 0 task(s).
+2026-11-21 17:56:02,329 | INFO | pawpal.app | Loaded data from data.json
+2026-11-21 17:56:13,312 | INFO | pawpal.app | User DELETED pet Mochi (P003) and its 0 task(s).
+2026-11-21 17:56:19,364 | INFO | pawpal.app | Loaded data from data.json
+2026-11-21 17:57:07,556 | INFO | ai_workflow | AI request received: 'Schedule a 30-minute walk for Mochi tomorrow at 7 AM.'
+2026-11-21 17:57:07,556 | INFO | ai_task_parser | Sending request to model gpt-4.1-mini (53 chars, 1 pets)
+2026-11-21 17:57:10,184 | INFO | httpx2 | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-21 17:57:10,192 | INFO | ai_workflow | AI parsing succeeded.
+2026-11-21 17:57:10,193 | INFO | ai_workflow | Validation passed for 1 task(s).
+2026-11-21 17:57:10,193 | INFO | ai_workflow | No scheduling conflicts found.
+2026-11-21 17:57:10,193 | INFO | ai_workflow | Proposal ready for human approval. Nothing saved yet.
+2026-11-21 18:01:06,994 | INFO | pawpal.app | Loaded data from data.json
+2026-11-21 18:01:51,198 | INFO | ai_workflow | AI request received: 'Schedule a 30-minute walk for Mochi tomorrow at 7 AM.'
+2026-11-21 18:01:51,198 | INFO | ai_task_parser | Sending request to model gpt-4.1-mini (53 chars, 1 pets)
+2026-11-21 18:01:53,601 | INFO | httpx2 | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-21 18:01:53,605 | INFO | ai_workflow | AI parsing succeeded.
+2026-11-21 18:01:53,606 | INFO | ai_workflow | Validation passed for 1 task(s).
+2026-11-21 18:01:53,606 | INFO | ai_workflow | No scheduling conflicts found.
+2026-11-21 18:01:53,606 | INFO | ai_workflow | Proposal ready for human approval. Nothing saved yet.
+2026-11-21 18:04:35,734 | INFO | pawpal.app | Loaded data from data.json
+2026-11-21 18:04:51,132 | INFO | ai_workflow | AI request received: 'Schedule a 30-minute walk for Mochi tomorrow at 7 AM.'
+2026-11-21 18:04:51,132 | INFO | ai_task_parser | Sending request to model gpt-4.1-mini (53 chars, 1 pets)
+2026-11-21 18:04:53,637 | INFO | httpx2 | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-21 18:04:53,642 | INFO | ai_workflow | AI parsing succeeded.
+2026-11-21 18:04:53,642 | INFO | ai_workflow | Validation passed for 1 task(s).
+2026-11-21 18:04:53,642 | INFO | ai_workflow | No scheduling conflicts found.
+2026-11-21 18:04:53,642 | INFO | ai_workflow | Proposal ready for human approval. Nothing saved yet.
+2026-11-21 18:05:14,574 | INFO | pawpal.app | User APPROVED 1 AI task(s): ['Walk Mochi']
+2026-11-21 18:05:39,620 | INFO | ai_workflow | AI request received: 'Schedule a 30-mGive Whiskers a 15-minute grooming session next Friday at 5 PMinute walk for Mochi tomorrow at 7 AM.'
+2026-11-21 18:05:39,620 | INFO | ai_task_parser | Sending request to model gpt-4.1-mini (115 chars, 1 pets)
+2026-11-21 18:05:41,086 | INFO | httpx2 | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-21 18:05:41,089 | INFO | ai_workflow | AI parsing succeeded.
+2026-11-21 18:05:41,089 | INFO | ai_workflow | AI asked for clarification: You mentioned a grooming session for Whiskers, but Whiskers is not in the list of available pets. Please confirm the pet's name for the grooming session.
+2026-11-21 18:05:57,978 | INFO | ai_workflow | AI request received: 'Schedule a 30-mGive Whiskers a 15-minute grooming session next Friday at 5 PMinute walk for Mochi tomorrow at 7 AM.'
+2026-11-21 18:05:57,978 | INFO | ai_task_parser | Sending request to model gpt-4.1-mini (115 chars, 2 pets)
+2026-11-21 18:06:00,029 | INFO | httpx2 | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-21 18:06:00,030 | INFO | ai_workflow | AI parsing succeeded.
+2026-11-21 18:06:00,030 | INFO | ai_workflow | Validation passed for 2 task(s).
+2026-11-21 18:06:00,030 | WARNING | ai_workflow | Found 1 scheduling conflict(s).
+2026-11-21 18:06:00,030 | INFO | ai_workflow | Proposal ready for human approval. Nothing saved yet.
+2026-11-21 18:07:26,546 | INFO | pawpal.app | User APPROVED 2 AI task(s): ['Grooming session', 'Minute walk']
+2026-11-24 17:35:47,214 | INFO | pawpal.app | Loaded data from data.json
