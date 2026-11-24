@@ -2,7 +2,7 @@
 
 **System:** PawPal+ (Streamlit pet-care scheduler) with an LLM task planner
 **Model used:** OpenAI `gpt-4.1-mini` (set with `OPENAI_MODEL`), temperature 0, JSON mode
-**Original project:** PawPal+ from Module 2-3
+**Original project:** PawPal+ from Modules 1-3
 
 ## What the AI does
 

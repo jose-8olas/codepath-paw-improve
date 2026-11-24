@@ -6,9 +6,9 @@ The project is about trust: language models make mistakes, so this system is bui
 
 ## Original Project
 
-**Original project: PawPal+** (the Module 2-3 pet-care scheduler)
+**Original project: PawPal+** (the Modules 1-3 pet-care scheduler)
 
-PawPal+ helped a busy pet owner plan care tasks for their pets. It was built with Python object-oriented design (`Owner`, `Pet`, `Task`, `Scheduler`) and a Streamlit interface: owners added pets and tasks (walks, feeding, medication, grooming) with a duration, priority, time and due date. The scheduler sorted tasks by priority and time, filtered them, warned about tasks at the same time or beyond the available time budget, and created the next occurrence of daily and weekly tasks. Data was saved to `data.json`, and the original project had 5 tests.
+PawPal+ helped a busy pet owner plan care tasks for their pets. It was built with Python object-oriented design (`Owner`, `Pet`, `Task`, `Scheduler`) and a Streamlit interface: owners added pets and tasks (walks, feeding, medication, grooming) with a duration, priority, time and due date. The scheduler sorted tasks by priority and time, filtered them, warned about tasks at the same time or beyond the available time budget, and created the next occurrence of daily and weekly tasks. Data was saved to `data.json`, and the original project had 5 tests. Its original README is kept in [`docs/original_readme.md`](docs/original_readme.md).
 
 **What this project adds:** a natural-language AI task planner with layered guardrails, a self-correction (retry) loop, human review and editing of every AI proposal, logging, a 163-test suite, and an evaluation harness that runs real prompts through the real model.
 
@@ -194,7 +194,7 @@ Response:  The requested hike duration of 10 hours exceeds the maximum allowed
            hike.
 ```
 
-The AI did not quietly shrink the hike to fit. See case 11 in `ai_interactions.md` for the raw output of both attempts.
+The AI did not quietly shrink the hike to fit. See case 11 in `ai_interactions.md` for the raw output of both attempts, including the rejected 600-minute proposal.
 
 **4. A past date is questioned, not silently changed**
 
@@ -477,15 +477,15 @@ Earlier results are kept in `assets/` (`eval_results_before.txt`, `eval_results_
 
 ### Guardrails, by layer
 
-| Layer            | What it does                                                                              | Evidence                               |
-| ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------- |
-| Prompt rules     | Registered pets only; ask when info is missing; no vet advice; ignore instruction changes | Eval cases 2, 3, 4, 7, 8               |
-| Validator        | Independent plain-Python checks on every proposal                                         | `test_validator.py`; eval case 11      |
-| Retry loop       | AI sees its errors; must ask rather than change the request                               | `test_retry.py`; eval case 11          |
-| Conflict check   | Same date and overlapping time range (start + duration), across all pets                  | `test_ai_workflow.py`; eval case 9     |
-| Human review     | Edit, approve, or reject; edits re-validated                                              | `test_revise_proposal.py`              |
-| No auto-save     | Only Approve writes data                                                                  | `test_nothing_saved_without_approval`  |
-| Graceful failure | Missing API key shows a clear message; bad model output is rejected                       | test_parser_error_handling; pawpal.log |
+| Layer            | What it does                                                                              | Evidence                                   |
+| ---------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Prompt rules     | Registered pets only; ask when info is missing; no vet advice; ignore instruction changes | Eval cases 2, 3, 4, 7, 8                   |
+| Validator        | Independent plain-Python checks on every proposal                                         | `test_validator.py`; eval case 11          |
+| Retry loop       | AI sees its errors; must ask rather than change the request                               | `test_retry.py`; eval case 11              |
+| Conflict check   | Same date and overlapping time range (start + duration), across all pets                  | `test_ai_workflow.py`; eval case 9         |
+| Human review     | Edit, approve, or reject; edits re-validated                                              | `test_revise_proposal.py`                  |
+| No auto-save     | Only Approve writes data                                                                  | `test_nothing_saved_without_approval`      |
+| Graceful failure | Missing API key shows a clear message; bad model output is rejected                       | `test_parser_error_handling`; `pawpal.log` |
 
 ### Console demo
 
@@ -608,7 +608,7 @@ This project changed how I think about AI features. Getting a model to produce a
 ├── tests/test_*.py           163 automated tests
 ├── diagrams/architecture.mmd System diagram (Mermaid source)
 ├── diagrams/class_diagram.mmd Updated class diagram (Mermaid source)
-├── diagrams/original_class_diagram.mmd Original Module 2 class diagram
+├── diagrams/original_class_diagram.mmd Original class diagram (Modules 1-3)
 ├── docs/original_readme.md   Archived README from the original project
 ├── assets/                   Evaluation and test results
 ├── ai_interactions.md        Reasoning traces from the evaluation
