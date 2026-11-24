@@ -2,7 +2,7 @@
 
 **System:** PawPal+ (Streamlit pet-care scheduler) with an LLM task planner
 **Model used:** OpenAI `gpt-4.1-mini` (set with `OPENAI_MODEL`), temperature 0, JSON mode
-**Original project:** PawPal+ from Modules 1-3
+**Original project:** PawPal+ from Module 2-3
 
 ## What the AI does
 
@@ -62,6 +62,6 @@ I built this with Claude (Claude Code) as a pair programmer: it read my Module 1
 
 **A suggestion I accepted:** Splitting the AI feature into a parser (`ai_task_parser.py`) and a separate validator and workflow (`ai_workflow.py`, `task_validator.py`), with Approve as the only save point. This made the AI testable with a mocked model (163 tests pass without an API key) and meant a bad model answer cannot change my data. I accepted it because it matched what I wanted to be able to explain: the AI proposes, code checks, and I decide.
 
-**A suggestion I changed:** The first vet-advice check only confirmed that no task was created. When I ran it against the real model, the reply asked for a dosage, which is not the behavior I wanted, even though the test passed. I had it rewritten with an explicit prompt rule and a check on the reply text. (Replace or extend this with a suggestion you personally turned down, if you have one, such as a feature you decided was too much.)
+**A suggestion I changed:** The first vet-advice check only confirmed that no task was created. When I ran it against the real model, the reply asked for a dosage, which is not the behavior I wanted, even though the test passed. I had it rewritten with an explicit prompt rule and a check on the reply text.
 
 **How I checked its work:** I ran the tests and the live evaluation myself, pasted the real output back, and kept the before/after evidence in `assets/`. I did not treat the simulated `--dry-run` results as evidence.

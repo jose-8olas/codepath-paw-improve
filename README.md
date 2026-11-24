@@ -6,7 +6,7 @@ The project is about trust: language models make mistakes, so this system is bui
 
 ## Original Project
 
-**Original project: PawPal+** (the Module 2 pet-care scheduler)
+**Original project: PawPal+** (the Module 2-3 pet-care scheduler)
 
 PawPal+ helped a busy pet owner plan care tasks for their pets. It was built with Python object-oriented design (`Owner`, `Pet`, `Task`, `Scheduler`) and a Streamlit interface: owners added pets and tasks (walks, feeding, medication, grooming) with a duration, priority, time and due date. The scheduler sorted tasks by priority and time, filtered them, warned about tasks at the same time or beyond the available time budget, and created the next occurrence of daily and weekly tasks. Data was saved to `data.json`, and the original project had 5 tests.
 
@@ -477,15 +477,15 @@ Earlier results are kept in `assets/` (`eval_results_before.txt`, `eval_results_
 
 ### Guardrails, by layer
 
-| Layer            | What it does                                                                              | Evidence                              |
-| ---------------- | ----------------------------------------------------------------------------------------- | ------------------------------------- |
-| Prompt rules     | Registered pets only; ask when info is missing; no vet advice; ignore instruction changes | Eval cases 2, 3, 4, 7, 8              |
-| Validator        | Independent plain-Python checks on every proposal                                         | `test_validator.py`; eval case 11     |
-| Retry loop       | AI sees its errors; must ask rather than change the request                               | `test_retry.py`; eval case 11         |
-| Conflict check   | Same date and overlapping time range (start + duration), across all pets                  | `test_ai_workflow.py`; eval case 9    |
-| Human review     | Edit, approve, or reject; edits re-validated                                              | `test_revise_proposal.py`             |
-| No auto-save     | Only Approve writes data                                                                  | `test_nothing_saved_without_approval` |
-| Graceful failure | Missing key, bad JSON, corrupt `data.json` handled                                        | Smoke-tested; `pawpal.log`            |
+| Layer            | What it does                                                                              | Evidence                               |
+| ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------- |
+| Prompt rules     | Registered pets only; ask when info is missing; no vet advice; ignore instruction changes | Eval cases 2, 3, 4, 7, 8               |
+| Validator        | Independent plain-Python checks on every proposal                                         | `test_validator.py`; eval case 11      |
+| Retry loop       | AI sees its errors; must ask rather than change the request                               | `test_retry.py`; eval case 11          |
+| Conflict check   | Same date and overlapping time range (start + duration), across all pets                  | `test_ai_workflow.py`; eval case 9     |
+| Human review     | Edit, approve, or reject; edits re-validated                                              | `test_revise_proposal.py`              |
+| No auto-save     | Only Approve writes data                                                                  | `test_nothing_saved_without_approval`  |
+| Graceful failure | Missing API key shows a clear message; bad model output is rejected                       | test_parser_error_handling; pawpal.log |
 
 ### Console demo
 
