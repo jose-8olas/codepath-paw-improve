@@ -6,7 +6,7 @@ The project is about trust: language models make mistakes, so this system is bui
 
 ## Original Project
 
-**Original project: PawPal+** (the Module 2 pet-care scheduler). Its original README is kept in [`docs/original_readme.md`](docs/original_readme.md).
+**Original project: PawPal+** (the Module 2 pet-care scheduler)
 
 PawPal+ helped a busy pet owner plan care tasks for their pets. It was built with Python object-oriented design (`Owner`, `Pet`, `Task`, `Scheduler`) and a Streamlit interface: owners added pets and tasks (walks, feeding, medication, grooming) with a duration, priority, time and due date. The scheduler sorted tasks by priority and time, filtered them, warned about tasks at the same time or beyond the available time budget, and created the next occurrence of daily and weekly tasks. Data was saved to `data.json`, and the original project had 5 tests.
 
