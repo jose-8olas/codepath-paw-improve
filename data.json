@@ -11,55 +11,43 @@
             "species": "dog",
             "tasks": [
                 {
-                    "title": "Morning walk",
-                    "task_type": "Feeding",
-                    "duration": 20,
-                    "priority": "high",
-                    "time": "08:00",
-                    "frequency": "daily",
-                    "completed": true,
-                    "due_date": "2026-10-30"
+                    "title": "Walk Mochi",
+                    "task_type": "Exercise",
+                    "duration": 30,
+                    "priority": "medium",
+                    "time": "07:00",
+                    "frequency": "as needed",
+                    "completed": false,
+                    "due_date": "2026-11-22"
                 },
                 {
-                    "title": "Morning walk",
-                    "task_type": "Feeding",
-                    "duration": 20,
-                    "priority": "high",
-                    "time": "08:00",
-                    "frequency": "daily",
+                    "title": "Minute walk",
+                    "task_type": "Exercise",
+                    "duration": 30,
+                    "priority": "medium",
+                    "time": "07:00",
+                    "frequency": "as needed",
                     "completed": false,
-                    "due_date": "2026-10-31"
+                    "due_date": "2026-11-22"
                 }
             ]
         },
         {
             "pet_id": "P002",
-            "name": "Max",
+            "name": "Whiskers",
             "species": "dog",
             "tasks": [
                 {
-                    "title": "MMMM",
+                    "title": "Grooming session",
                     "task_type": "Grooming",
-                    "duration": 20,
-                    "priority": "high",
-                    "time": "08:00",
-                    "frequency": "daily",
+                    "duration": 15,
+                    "priority": "medium",
+                    "time": "17:00",
+                    "frequency": "as needed",
                     "completed": false,
-                    "due_date": "2026-10-30"
+                    "due_date": "2026-11-27"
                 }
             ]
-        },
-        {
-            "pet_id": "P003",
-            "name": "Mochi",
-            "species": "dog",
-            "tasks": []
-        },
-        {
-            "pet_id": "P004",
-            "name": "Mochi",
-            "species": "dog",
-            "tasks": []
         }
     ]
 }

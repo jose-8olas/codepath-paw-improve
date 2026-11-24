@@ -1,4 +1,3 @@
-
 from datetime import date
 
 from pawpal_system import Owner, Pet, Task
@@ -35,4 +34,6 @@ def test_save_and_load_json(tmp_path):
     assert loaded_owner.pets[0].name == "Buddy"
     assert loaded_owner.pets[0].tasks[0].title == "Morning Walk"
     assert loaded_owner.pets[0].tasks[0].due_date == date(2026, 10, 30)
-    assert loaded_owner.pets[0].tasks[0].priority == "High"
+
+    # Priority is normalized to lowercase when a Task is created.
+    assert loaded_owner.pets[0].tasks[0].priority == "high"

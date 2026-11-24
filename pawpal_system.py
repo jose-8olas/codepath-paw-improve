@@ -1,7 +1,14 @@
-
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import date, timedelta, datetime
+
+from task_validator import (
+    time_ranges_overlap,
+    VALID_FREQUENCIES,
+    VALID_PRIORITIES,
+    VALID_TASK_TYPES
+)
 
 
 @dataclass
@@ -16,9 +23,110 @@ class Task:
     completed: bool = False
     due_date: date = field(default_factory=date.today)
 
+    def __post_init__(self) -> None:
+        """Normalize priority so "High" and "high" are stored the same."""
+        if isinstance(self.priority, str):
+            self.priority = self.priority.strip().lower()
+
     def mark_completed(self) -> None:
         """Mark the task as completed."""
         self.completed = True
+
+    def update(
+        self,
+        *,
+        title: str | None = None,
+        task_type: str | None = None,
+        duration: int | None = None,
+        priority: str | None = None,
+        time: str | None = None,
+        frequency: str | None = None,
+        due_date: date | None = None
+    ) -> dict:
+        """
+        Change one or more fields of this task.
+
+        Every new value is validated first, so a bad value leaves the
+        task completely unchanged. Raises ValueError for bad values.
+        Returns {field: (old, new)} for the fields that changed.
+        """
+        new_values = {}
+
+        if title is not None:
+            if not isinstance(title, str) or not title.strip():
+                raise ValueError("Task title cannot be empty.")
+            if len(title.strip()) > 100:
+                raise ValueError(
+                    "Task title cannot exceed 100 characters."
+                )
+            new_values["title"] = title.strip()
+
+        if task_type is not None:
+            if (
+                not isinstance(task_type, str)
+                or task_type.strip().lower() not in VALID_TASK_TYPES
+            ):
+                raise ValueError(f"Unsupported task type: {task_type}.")
+            new_values["task_type"] = task_type.strip().capitalize()
+
+        if duration is not None:
+            if (
+                isinstance(duration, bool)
+                or not isinstance(duration, int)
+                or not 1 <= duration <= 240
+            ):
+                raise ValueError(
+                    "Duration must be a whole number between "
+                    "1 and 240 minutes."
+                )
+            new_values["duration"] = duration
+
+        if priority is not None:
+            if (
+                not isinstance(priority, str)
+                or priority.strip().lower() not in VALID_PRIORITIES
+            ):
+                raise ValueError(f"Unsupported priority: {priority}.")
+            new_values["priority"] = priority.strip().lower()
+
+        if time is not None:
+            if not isinstance(time, str) or not re.fullmatch(
+                r"\d{2}:\d{2}", time
+            ):
+                raise ValueError("Time must use 24-hour HH:MM format.")
+
+            try:
+                datetime.strptime(time, "%H:%M")
+            except ValueError:
+                raise ValueError(
+                    "Time must use 24-hour HH:MM format."
+                ) from None
+
+            new_values["time"] = time
+
+        if frequency is not None:
+            if (
+                not isinstance(frequency, str)
+                or frequency.strip().lower() not in VALID_FREQUENCIES
+            ):
+                raise ValueError(f"Unsupported frequency: {frequency}.")
+            new_values["frequency"] = frequency.strip().lower()
+
+        if due_date is not None:
+            if not isinstance(due_date, date):
+                raise ValueError("Due date must be a date.")
+            new_values["due_date"] = due_date
+
+        changes = {}
+
+        for field_name, new_value in new_values.items():
+            old_value = getattr(self, field_name)
+
+            if old_value != new_value:
+                changes[field_name] = (old_value, new_value)
+                setattr(self, field_name, new_value)
+
+        return changes
 
 
 @dataclass
@@ -36,6 +144,21 @@ class Pet:
     def get_tasks(self) -> list[Task]:
         """Return this pet's care tasks."""
         return self.tasks.copy()
+
+    def remove_task(self, task: Task) -> bool:
+        """
+        Remove one specific task from this pet.
+
+        Matches by identity, not equality, so deleting one of two
+        identical-looking tasks never removes the other one.
+        Returns True if the task was found and removed.
+        """
+        for index, existing in enumerate(self.tasks):
+            if existing is task:
+                del self.tasks[index]
+                return True
+
+        return False
 
 
 class Owner:
@@ -59,11 +182,147 @@ class Owner:
         """Add a pet to the owner."""
         self.pets.append(pet)
 
-    def remove_pet(self, pet_id: str) -> None:
-        """Remove a pet using its ID."""
+    def remove_pet(self, pet_id: str) -> bool:
+        """
+        Remove a pet, and all of its tasks, using its ID.
+
+        Returns True if a pet was removed.
+        """
+        count_before = len(self.pets)
+
         self.pets = [
             pet for pet in self.pets
             if pet.pet_id != pet_id
+        ]
+
+        return len(self.pets) < count_before
+
+    def remove_task(self, task: Task) -> bool:
+        """
+        Remove a task from whichever pet owns it.
+
+        Returns True if the task was found and removed.
+        """
+        for pet in self.pets:
+            if pet.remove_task(task):
+                return True
+
+        return False
+
+    def clear_completed_tasks(self) -> int:
+        """Remove every completed task and return how many were removed."""
+        removed = 0
+
+        for pet in self.pets:
+            count_before = len(pet.tasks)
+
+            pet.tasks = [
+                task for task in pet.tasks
+                if not task.completed
+            ]
+
+            removed += count_before - len(pet.tasks)
+
+        return removed
+
+    def next_pet_id(self) -> str:
+        """
+        Return an unused pet ID such as "P003".
+
+        Uses the highest existing number plus one, so IDs never
+        collide after a pet has been removed.
+        """
+        highest = 0
+
+        for pet in self.pets:
+            match = re.fullmatch(r"P(\d+)", pet.pet_id)
+
+            if match:
+                highest = max(highest, int(match.group(1)))
+
+        return f"P{highest + 1:03d}"
+
+    def update_pet(
+        self,
+        pet_id: str,
+        *,
+        name: str | None = None,
+        species: str | None = None
+    ) -> bool:
+        """
+        Rename a pet or change its species.
+
+        Returns False if no pet has that ID. Raises ValueError for an
+        empty value or a name another pet already uses (compared
+        ignoring case), because the AI planner finds pets by name.
+        """
+        pet = next(
+            (pet for pet in self.pets if pet.pet_id == pet_id),
+            None
+        )
+
+        if pet is None:
+            return False
+
+        new_name = pet.name
+        new_species = pet.species
+
+        if name is not None:
+            cleaned_name = name.strip() if isinstance(name, str) else ""
+
+            if not cleaned_name:
+                raise ValueError("Pet name cannot be empty.")
+
+            if len(cleaned_name) > 50:
+                raise ValueError("Pet name cannot exceed 50 characters.")
+
+            if any(
+                other.pet_id != pet_id
+                and other.name.lower() == cleaned_name.lower()
+                for other in self.pets
+            ):
+                raise ValueError(
+                    f"Another pet is already named {cleaned_name}."
+                )
+
+            new_name = cleaned_name
+
+        if species is not None:
+            cleaned_species = (
+                species.strip() if isinstance(species, str) else ""
+            )
+
+            if not cleaned_species:
+                raise ValueError("Species cannot be empty.")
+
+            new_species = cleaned_species
+
+        pet.name = new_name
+        pet.species = new_species
+
+        return True
+
+    def find_conflicting_tasks(
+        self, task: Task
+    ) -> list[tuple[Pet, Task]]:
+        """
+        Return (pet, task) pairs for other incomplete tasks that share
+        this task's time on the same date (the durations overlap).
+        A completed task has no conflicts.
+        """
+        if task.completed:
+            return []
+
+        return [
+            (pet, other)
+            for pet in self.pets
+            for other in pet.tasks
+            if other is not task
+            and not other.completed
+            and other.due_date == task.due_date
+            and time_ranges_overlap(
+                task.time, task.duration, other.time, other.duration
+            )
         ]
 
     def get_all_tasks(self) -> list[Task]:
@@ -255,48 +514,79 @@ class Scheduler:
 
         return next_task
 
-    def detect_conflicts(self) -> list[Task]:
-        """Return tasks exceeding the available time budget."""
-        conflicts = []
-        total_duration = 0
+    def detect_conflicts(
+        self, target_date: date | None = None
+    ) -> list[Task]:
+        """
+        Return tasks that exceed the available time budget.
+
+        The budget applies to each day separately. If target_date is
+        given, only that day is checked. Completed tasks are ignored.
+        """
+        tasks_by_date: dict[date, list[Task]] = {}
 
         for task in self.sort_by_time():
-            total_duration += task.duration
+            if task.completed:
+                continue
 
-            if total_duration > self.available_time:
-                conflicts.append(task)
+            if target_date is not None and task.due_date != target_date:
+                continue
+
+            tasks_by_date.setdefault(task.due_date, []).append(task)
+
+        conflicts = []
+
+        for day_tasks in tasks_by_date.values():
+            total_duration = 0
+
+            for task in day_tasks:
+                total_duration += task.duration
+
+                if total_duration > self.available_time:
+                    conflicts.append(task)
 
         return conflicts
 
     def detect_time_conflicts(self) -> list[str]:
-        """Return warnings for incomplete tasks scheduled at the same time."""
+        """
+        Return warnings for incomplete tasks whose times overlap
+        on the same day.
+        """
         warnings = []
-        seen_times = {}
+        tasks = [task for task in self.tasks if not task.completed]
 
-        for task in self.tasks:
-            if task.completed:
-                continue
-
-            key = (task.due_date, task.time)
-
-            if key in seen_times:
-                other_task = seen_times[key]
-
-                warnings.append(
-                    f"Conflict: '{other_task.title}' and "
-                    f"'{task.title}' are both scheduled for "
-                    f"{task.time} on {task.due_date}."
-                )
-            else:
-                seen_times[key] = task
+        for index, task in enumerate(tasks):
+            for other_task in tasks[:index]:
+                if (
+                    other_task.due_date == task.due_date
+                    and time_ranges_overlap(
+                        other_task.time, other_task.duration,
+                        task.time, task.duration
+                    )
+                ):
+                    warnings.append(
+                        f"Conflict: '{other_task.title}' "
+                        f"({other_task.time}, {other_task.duration} min) "
+                        f"and '{task.title}' "
+                        f"({task.time}, {task.duration} min) overlap "
+                        f"on {task.due_date}."
+                    )
 
         return warnings
 
-    def generate_daily_plan(self) -> list[Task]:
-        """Generate a daily plan sorted by priority and time."""
+    def generate_daily_plan(
+        self, target_date: date | None = None
+    ) -> list[Task]:
+        """
+        Generate a plan sorted by priority and time.
+
+        If target_date is given, only incomplete tasks due on that
+        date are included. Otherwise all incomplete tasks are.
+        """
         return [
             task for task in self.sort_by_priority()
             if not task.completed
+            and (target_date is None or task.due_date == target_date)
         ]
 
     def find_next_available_slot(

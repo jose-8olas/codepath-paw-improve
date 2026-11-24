@@ -1,4 +1,3 @@
-
 from pawpal_system import Owner, Pet, Task, Scheduler
 from datetime import date
 
@@ -108,9 +107,9 @@ def main():
     else:
         print("\nAll tasks fit within the available time budget.")
 
-    # Check for tasks scheduled at the same time.
-    print("\nSame-Time Conflict Check")
-    print("========================")
+    # Check for tasks whose times overlap.
+    print("\nTime Overlap Check")
+    print("==================")
 
     time_conflicts = scheduler.detect_time_conflicts()
 
@@ -118,7 +117,7 @@ def main():
         for warning in time_conflicts:
             print(f"WARNING: {warning}")
     else:
-        print("No same-time conflicts detected.")
+        print("No overlapping tasks detected.")
 
     # Test weekly recurring tasks.
     print("\nWeekly Recurring Task Test")

@@ -1,0 +1,53 @@
+flowchart TD
+    Owner(["Pet owner"])
+
+    subgraph UI_LAYER["Streamlit UI - app.py"]
+        UI["Task planner, manual forms,<br/>edit and delete, schedule view"]
+        Review{{"HUMAN REVIEW<br/>Edit, approve, or reject"}}
+    end
+
+    subgraph AI_PIPELINE["AI task pipeline - ai_workflow.py"]
+        Parser["Parser<br/>ai_task_parser.py<br/>OpenAI model to JSON proposal"]
+        Clarify{"Needs<br/>clarification?"}
+        Validator["Validator<br/>task_validator.py<br/>independent rule checks"]
+        Failed{"Validation<br/>failed?"}
+        Retries{"Retries<br/>left?"}
+        Conflicts["Conflict check<br/>find_proposal_conflicts"]
+    end
+
+    subgraph CORE["Core model - pawpal_system.py"]
+        Model["Owner, Pet, Task, Scheduler"]
+        Store[("data.json")]
+    end
+
+    subgraph RELIABILITY["Reliability and evaluation"]
+        Tests["pytest suite<br/>163 tests, mocked AI"]
+        Eval["eval_ai.py<br/>11 real prompts"]
+        Evidence["assets/eval_results.txt<br/>ai_interactions.md traces"]
+    end
+
+    Log["pawpal.log<br/>requests, validation, decisions"]
+
+    Owner -->|"natural-language request"| UI
+    UI --> Parser
+    Parser -->|"JSON proposal"| Clarify
+    Clarify -->|"yes: ask a question"| UI
+    Clarify -->|"no"| Validator
+    Validator --> Failed
+    Failed -->|"no"| Conflicts
+    Failed -->|"yes"| Retries
+    Retries -->|"yes: errors fed back"| Parser
+    Retries -->|"no: show errors"| UI
+    Conflicts -->|"proposal + warnings"| Review
+    Review -->|"edits re-validated"| Validator
+    Review -->|"reject: nothing saved"| UI
+    Review -->|"approve: only save point"| Model
+    Model <--> Store
+
+    Parser -.-> Log
+    Validator -.-> Log
+    Review -.-> Log
+
+    Tests -.-> AI_PIPELINE
+    Eval --> AI_PIPELINE
+    Eval --> Evidence
