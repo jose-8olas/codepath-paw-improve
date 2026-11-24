@@ -7,4 +7,4 @@ __pycache__/
 .env
 data.json
 data.json.corrupt
-pawpal.log
+pawpal.log.coverage
